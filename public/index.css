@@ -1,0 +1,42 @@
+.leaflet-container {
+    height: 98vh;
+    width: 100%;
+}
+
+.location-marker {
+    display: block;
+    background: #0F80AA;
+    box-shadow: 0 0 0 rgba(15,128,187, 0.4);
+    border: 1px solid white;
+    border-radius: 50%;
+    margin: 0 auto;
+    height: 12px;
+    width: 12px;
+    animation: pulse 2s infinite;
+}
+
+@-webkit-keyframes pulse {
+    0% {
+      -webkit-box-shadow: 0 0 0 0 rgba(15,128,187, 0.4);
+    }
+    70% {
+        -webkit-box-shadow: 0 0 0 10px rgba(15,128,187, 0);
+    }
+    100% {
+        -webkit-box-shadow: 0 0 0 0 rgba(15,128,187, 0);
+    }
+  }
+  @keyframes pulse {
+    0% {
+      -moz-box-shadow: 0 0 0 0 rgba(15,128,187, 0.4);
+      box-shadow: 0 0 0 0 rgba(15,128,187, 0.4);
+    }
+    70% {
+        -moz-box-shadow: 0 0 0 10px rgba(15,128,187, 0);
+        box-shadow: 0 0 0 10px rgba(15,128,187, 0);
+    }
+    100% {
+        -moz-box-shadow: 0 0 0 0 rgba(15,128,187, 0);
+        box-shadow: 0 0 0 0 rgba(15,128,187, 0);
+    }
+  }
