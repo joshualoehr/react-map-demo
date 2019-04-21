@@ -1,6 +1,30 @@
+body {
+    margin: 0;
+}
+
 .leaflet-container {
-    height: 98vh;
+    height: 98.5vh;
     width: 100%;
+}
+
+.draw-control {
+    display: flex;
+    border: 2px solid rgba(0,0,0,0.2);
+    border-radius: 10%;
+    background-clip: padding-box;
+    background: white;
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+}
+
+.draw-control:hover {
+  background: #EEEEEE;
+}
+
+.draw-control > img {
+    width: 75%;
+    margin: auto;
 }
 
 .location-marker {
