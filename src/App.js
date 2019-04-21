@@ -8,21 +8,25 @@ const PageLoadMask = ({ loading }) => (
 );
 
 export default () => {
-    const [loading, setLoading] = useState(true);
+    const [fetching, setFetching] = useState(false);
     const [position, setPosition] = useState(null);
 
     useEffect(() => {
-        navigator.geolocation.getCurrentPosition(position => {
-            const { latitude, longitude } = position.coords;
-            setPosition([latitude, longitude]);
-            setLoading(false);
-        }, console.error, {
-            useHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-        });
+        if (!position && !fetching) {
+            setFetching(true);
+            navigator.geolocation.getCurrentPosition(position => {
+                const { latitude, longitude } = position.coords;
+                setPosition([latitude, longitude]);
+                setFetching(false);
+            }, console.error, {
+                useHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            });
+        }
     });
 
+    const loading = !position;
     return (
         <div>
             <PageLoadMask loading={loading} />
