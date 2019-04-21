@@ -1,25 +1,29 @@
 import L from 'leaflet';
 import { withLeaflet, MapControl } from 'react-leaflet';
 
-L.Control.Watermark = L.Control.extend({
+L.Control.Draw = L.Control.extend({
     onAdd: map => {
         const div = L.DomUtil.create('div');
         div.classList.add('draw-control');
+        div.drawing = false;
 
         const img = L.DomUtil.create('img');
-        img.src = 'pencil-edit-button.svg';
+        img.srcs = ['pencil-edit-button.svg', 'cancel.svg'];
+        img.src = img.srcs[0];
         
         div.append(img);
-        return div;
-    },
-    onRemove: map => {
+        L.DomEvent.on(div, 'click', () => {
+            div.drawing = !div.drawing;
+            img.src = img.srcs[div.drawing ? 1 : 0];
+        });
 
+        return div;
     }
 });
 
 class DrawControl extends MapControl {
     createLeafletElement(props) {
-        return new L.Control.Watermark(props);
+        return new L.Control.Draw(props);
     }
 }
 

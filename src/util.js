@@ -5,3 +5,5 @@ export const randNorm = (mu = 0, sigma = 1) => {
     const z2 = Math.sqrt(-2.0 * Math.log(x1)) * Math.sin(2.0 * Math.PI * x2);
     return [z1, z2].map(z => z * sigma + mu);
 };
+
+export const rotate = (arr, n = 1) => arr.slice(n).concat(arr.slice(0, n));
