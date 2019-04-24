@@ -1,8 +1,12 @@
 import React from 'react';
 import { Map as LeafletMap, Marker, Polygon, Polyline, TileLayer } from 'react-leaflet';
+import L from 'leaflet';
 import CurrentLocationMarker from './CurrentLocationMarker';
 import DrawControl from './DrawControl';
-import { randNorm } from '../util';
+import { randNorm, polygonContainsPoint } from '../util';
+
+const MARKER_SELECTED = 'marker-icon-red.png';
+const MARKER_UNSELECTED = 'marker-icon-blue.png';
 
 const NUM_MARKERS = 20;
 const OFFSETS = Array.from(Array(NUM_MARKERS), () => randNorm(0, 0.005));
@@ -13,8 +17,11 @@ export default class Map extends React.Component {
         this.state = {
             drawingEnabled: false,
             drawingActive: false,
+            markers: [],
             polyline: [],
-            polygon: []
+            polygon: [],
+            selected: [],
+            unselected: []
         }
     }
 
@@ -35,21 +42,36 @@ export default class Map extends React.Component {
     }
 
     draw = (position) => {
-        this.setState((state) => ({ polyline: state.polyline.concat(position) }));
+        this.setState(({polyline}) => ({ polyline: polyline.concat(position) }));
     }
 
     select = () => {
-        this.setState({ polygon: this.state.polyline })
+        const unselected = [], selected = [];
+        this.state.markers.forEach(marker => {
+            if (polygonContainsPoint(marker, this.state.polyline)) {
+                selected.push(marker);
+            } else {
+                unselected.push(marker);
+            }
+        });
+        this.setState({ unselected, selected });
     }
 
     clear = () => {
-        this.setState({ polyline: [], polygon: [] });
+        this.setState({ polyline: [], polygon: [], selected: [], unselected: [] });
+    }
+
+    componentDidUpdate() {
+        const { position } = this.props;
+        if (position && this.state.unselected.length === 0) {
+            const markers = OFFSETS.map(offset => position.map((pos, i) => pos + offset[i]));
+            this.setState({ markers, unselected: markers });
+        }
     }
 
     render() {
         const { position } = this.props;
-        const { drawingActive, drawingEnabled, polygon, polyline } = this.state;
-        let markerPositions = !position ? [] : OFFSETS.map(offset => position.map((pos, i) => pos + offset[i]));
+        const { drawingActive, drawingEnabled, polygon, polyline, selected, unselected } = this.state;
         return (
             <LeafletMap 
                 center={position} 
@@ -76,8 +98,11 @@ export default class Map extends React.Component {
                     position="topright" 
                     onClick={this.setDrawingEnabled}/>
                 <CurrentLocationMarker position={position} />
-                {markerPositions.map(([lat, lng], idx) => (
-                    <Marker key={`marker${idx}`} position={[lat, lng]} />
+                {unselected.map(([lat, long], idx) => (
+                    <Marker key={`marker${idx}`} position={[lat, long]} icon={L.icon({ iconUrl: MARKER_UNSELECTED })} />
+                ))}
+                {selected.map(([lat, long], idx) => (
+                    <Marker key={`marker${idx}`} position={[lat, long]} icon={L.icon({ iconUrl: MARKER_SELECTED })} />
                 ))}
                 <Polyline color="blue" positions={polyline} />
                 <Polygon color="blue" positions={polygon} />
