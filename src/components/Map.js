@@ -1,5 +1,5 @@
 import React from 'react';
-import { Map as LeafletMap, Marker, Polyline, TileLayer } from 'react-leaflet';
+import { Map as LeafletMap, Marker, Polygon, Polyline, TileLayer } from 'react-leaflet';
 import CurrentLocationMarker from './CurrentLocationMarker';
 import DrawControl from './DrawControl';
 import { randNorm } from '../util';
@@ -13,34 +13,42 @@ export default class Map extends React.Component {
         this.state = {
             drawingEnabled: false,
             drawingActive: false,
-            polylinePositions: []
+            polyline: [],
+            polygon: []
         }
     }
 
     setDrawingEnabled = (drawingEnabled) => {
-        console.log('setDrawingEnabled', drawingEnabled);
+        if (drawingEnabled) {
+            this.clear();
+        }
         this.setState({ drawingEnabled });
     }
 
     setDrawingActive = (drawingActive) => {
-        console.log('setDrawingActive', drawingActive);
-        if (drawingActive)
+        if (drawingActive) {
             this.clear();
+        } else {
+            this.select();
+        }
         this.setState({ drawingActive });
     }
 
     draw = (position) => {
-        console.log(position);
-        this.setState((state) => ({ polylinePositions: state.polylinePositions.concat(position) }));
+        this.setState((state) => ({ polyline: state.polyline.concat(position) }));
+    }
+
+    select = () => {
+        this.setState({ polygon: this.state.polyline })
     }
 
     clear = () => {
-        this.setState({ polylinePositions: [] });
+        this.setState({ polyline: [], polygon: [] });
     }
 
     render() {
         const { position } = this.props;
-        const { drawingActive, drawingEnabled, polylinePositions } = this.state;
+        const { drawingActive, drawingEnabled, polygon, polyline } = this.state;
         let markerPositions = !position ? [] : OFFSETS.map(offset => position.map((pos, i) => pos + offset[i]));
         return (
             <LeafletMap 
@@ -66,14 +74,13 @@ export default class Map extends React.Component {
                 />
                 <DrawControl 
                     position="topright" 
-                    
-                    
                     onClick={this.setDrawingEnabled}/>
                 <CurrentLocationMarker position={position} />
                 {markerPositions.map(([lat, lng], idx) => (
                     <Marker key={`marker${idx}`} position={[lat, lng]} />
                 ))}
-                <Polyline color="blue" positions={polylinePositions} />
+                <Polyline color="blue" positions={polyline} />
+                <Polygon color="blue" positions={polygon} />
             </LeafletMap>
         );
     }
